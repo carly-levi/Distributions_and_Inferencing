@@ -1,1 +1,1 @@
-# HW3_Carly_Levi
+# Sample_Distributions_and_Inferencing
