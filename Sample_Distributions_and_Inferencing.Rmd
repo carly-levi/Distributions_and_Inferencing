@@ -1,0 +1,415 @@
+---
+title: "HW3_Carly_Levi"
+author: "Carly Levi"
+date: "November 8, 2015"
+output: html_document
+---
+
+```{r load_libraries}
+set.seed(9876) #set seed
+library(ggplot2) #load libraries
+library(dplyr)
+```
+
+#Part 1
+
+##Loading the Dataset
+```{r}
+pops <- read.csv("https://stat.duke.edu/~mc301/data/cat_pops.csv")
+#load dataset
+```
+
+##Function for Sampling Distributions
+```{r}
+proportions <- function(data, sample_size, bw){
+  props <- data.frame(values = rep(NA, 15000)) #Creates a data frame with 15000 NA
+  for (i in 1:15000){
+    s <- sample(data, sample_size, replace = TRUE) #takes a sample with replacement of a given sample size
+    prop <- sum(s == "success") / sample_size #creates a proportion for a given column in a dataset
+    props$values[i] <- prop #assigns the calculated proportion to the data frame, props
+  }
+  histogram <- ggplot(data = props, aes(x = values))+ #creates a histogram of the 15000 calculated sample proportions
+    geom_histogram(binwidth = bw) +
+    ggtitle("Histogram of Proportions") +
+    xlab("Proportions")
+  npp <- ggplot(data = props, aes(sample = values))+ #creates a normal probability plot of 15000 calulated sample proportions
+    geom_point(stat = "qq") +
+    ggtitle("Normal Probability Plot of Proportions") +
+    ylab("Proportions")
+print(histogram)
+print(npp)
+props %>% #provides that sample statistics of the data frame
+  summarise(mean = mean(props$values), sd = sd(props$values)) 
+}
+```
+
+###n = 10
+####p_very_low
+```{r}
+proportions(pops$p_very_low, 10, .05)
+```
+The distribution of p_very_low with a sample size of 10 is significantly right skewed.  The mean of the distribution is ~.031 and the standard deviation is ~.0555. The right skew of the distribution is caused by the small number of "successes" within the p_very_low variable, causing a large number small proportions to occur.  Since the distribution of proportions is left skewed, the normal probability plot shows a large number of the 15000 simulations having a smaller proportion.  The normal probability plot is somewhat linear, yet the lower tail is much longer representing the right skew.
+
+####p_low
+```{r}
+proportions(pops$p_low, 10, .05)
+```
+The distribution of p_low  with a sample size of 10 is also right skewed, yet not as extremely right skewed as the distribution of p_very_low.  The mean for this distribution is ~.199 and the standard deviation is ~.126.  The distribution of the proportions of p_low is right skewed because the number of "successes" in the dataset is fewer than the number of "failures", so there is a higher chance of having more occurences smaller proportions closer to 0, like in the p_very_low distribution.  In the normal probability plot, the lower tail is much longer than the upper tail, representing the right skewness of the distribution, similar to the normal probability plot of p_very_low.  However, the lower tail is shorter than that of p_very_low because there are more "successes" and less "failures" within the p_low variable compared to the p_very_low variable.  There are more possible values for proportions in the normal probability plot for p_low than for p_very_low because of more equal occurences of "successes" and "failures" in p_low.  
+
+####p_med
+```{r}
+proportions(pops$p_med, 10, .05)
+```
+The distribution of the proportions of p_med with a sample size of 10 is nearly normally distributed with a mean of ~.502 and a standard deviation of ~.159.  Compared to the distributions of p_very_low and p_low, the distribution of p_med is more normally distributed due to nearly equal numbers of "successes" and "failures" in the p_med variable.  As the distribution of proportions for p_med becomes more normally distributed, the standard deviation increases compared to the distributions of p_very_low and p_low because there are a larger number of possible proportions in p_med than in p_low and p_very_low due to nearly equal numbers of "successes" and "failures" in the p_med variable. Following the same trend as the distribution of p_low, the normal probability plot of p_med has a larger number of possible proportions because of the nearly equal numbers of "successes" and "failures" in the p_med variable.  The two tails of the normal probabilty plot are nearly equal and the plot is linear representing the normal distribution of proportions.
+
+####p_high
+```{r}
+proportions(pops$p_high, 10, .05)
+```
+Unlike any of the other distributions of proportions with a sample size of 10, the distribution of the proportions of p_high is left skewed with a mean of ~.900 and a standard deviation of ~.0952.  The left skew in the distribution of proportions of p_high can be accounted for by the higher number of "successes" compared to "failures" in the dataset. The mean for the distribution is much higher than any of the other distributions with a sample size 10 because of the distribution's left skew.  The normal probability plot for the distribution of p_high has fewer possible proportion, like with p_low, values because of the large difference between the number of "successes" and "failures" under the variable p_high, but it is still linear.  The upper tail of the plot is much long (i.e. has many more simulations) than the lower tail because of the left skew of the distribution.
+
+###n = 50
+####p_very_low
+```{r}
+proportions(pops$p_very_low, 50, .01)
+```
+The distributions of proportions of the variable p_very_low with a sample size of 50 is still right skewed like the distribution of p_very_low with a sample size of 10.  However, with a sample size of 50, the distribution of proportions becomes less skewed because the sample size has increased.  According to the Central Limit Theory, as sample size increases the distribution of proportions becomes more normally distributed because the outliers in a dataset have a lesser effect on the overall distribution.  The norma probability plot of the variable p_very_low still has a long lower tail because the distribution is left skewed, but it is not as long as the tail in the normal probability plot for sample size 10 because the distribution of sample size 50 is more normally distributed.  There are more possible discrete proportions with a sample size 50 than sample size 10.  The mean of p_very_low with sample size 50 is very similar to the mean of p_very_low with sample size 10, but the standard deviation has decreased.
+
+####p_low
+```{r}
+proportions(pops$p_low, 50, .025)
+```
+The distribution of proportions for the variable p_low with a sample size 50 is nearly normally distributed, but still has a slight right skew.  As the sample size increases, the distribution becomes more normal, which is seen from the distributions of p_low with sample size 10 and 50.  the distribution of p_low is less skewed than the distribution of p_very_low, like with sample size 10. The mean of the distribution is very similar to the distribution of p_low with sample size 10 along with a decrease in the standard deviation. The normal probability plot of p_low looks to be nearly linear wit the upper and lower tails being nearly equal in size.  However, the lower tail is slightly longer than the upper tail, representing the slight right skew of the distribution.  Similar to the p_very_low distribution with sample size 50, the number of possible proportions has increased from the corresponding distribution with sample size 10.  The number of possible proportions for p_low is greater than that of p_very_low
+
+####p_med
+```{r}
+proportions(pops$p_med, 50, .025)
+```
+The distribution of proportions for p_med is normally distribted around the mean of the dataset, ~0.50. The mean for all distributions of p_med will be around ~.50 because according to the central limit theorem, the mean of the distribution of the sample statistic is equal to that of the population parameter.  The distribution of p_med is normally distributed and can also be seen in the normal propbability plot.  The normmal probabilty plot has more possible proportions as the sample size increases, making the plot look more continuous and linear. The standard deviation has decreased as sample size increases because the outliers in the sample distribution have a smaller effect on the overall distribution is there are more observations.
+
+####p_high
+```{r}
+proportions(pops$p_high, 50, .01)
+```
+The mean of the sample distribution of p_high is similar to that with sample size 10 and 200 because the mean is equal to the population parameter.  The distribution of proportions is still left skewed, but is becoming more normally distributed as sample size increases.  The normal propbabilty plot shows the left skew through the arch is the plot and a longer upper tail than lower tail. The standard deviation has also decreased due to the increased sample size.  Since the distribution is still skewed, it may be more useful to increase the sample size of the categorical variable according to the Central Limit Theorem.
+
+###n = 200
+####p_very_low
+```{r}
+proportions(pops$p_very_low, 200, .005)
+```
+The distribution created from the proportions of the variable p_very_low  with a sample size of 200 is more normally distributed than those of sample size 10 and 50, but is still slitghtly right skewed due to the large differences in the number of "successes" and "failures".  According the the Central Limit Theorem, a larger sample size of 200 would eventually create a normal distribution of the sample statistic.  The normal probabilty plot shows the slight left skew through the longer lower tail and the concave up of the plot.  The mean of the distribution is similar to the mean of the corresponding distributions with sample sizes of 10 and 50.  The standard deviation has continued to shrink emphasizing that as the sample size increases, outliers have a smaller effect on the overall distribution of the sample statistic.
+
+####p_low
+```{r}
+proportions(pops$p_low, 200, .01)
+```
+With a larger sample size of 200, the distribution of the sample statistic for p_low is now normally distributed as explained by the Central Limit Theorem.  The normal probabilty plot is also relatively linear with both tails being nearly equal in length.  The distribution of p_low with sample size of 10 and 50 is still slightly skewed, but as the sample size increases, the distribution of the sample statistic become more normal because outlier proportions have a lesser effect on the overall distribution.  The distribution of p_low at n = 200 is more normally distributed than p_very_low and p_high at n = 200 because the number of "successes" to "failures" is more equal.
+
+####p_med
+```{r}
+proportions(pops$p_med, 200, .01)
+```
+The distribution of the sample statistic for p_med is normally distributed for a sample size of 200, similar to sample sizes 10 and 50.  This is so because the number of "successes" and "failures" within the variable are equal, so the distribution should be normal no matter how marge the sample size.  The normal probability plot for p_med also represents the normal distribution and seems to have even more possible proportions, making the plot look linear.  There is no curve in the plot, representing the normalcy of the distribution.
+
+####p_high
+```{r}
+proportions(pops$p_high, 200, .01)
+```
+The distribution of the sample statistic for p_high looks to be pretty normally distributed, but with a slight left skew due to the vast difference between the number of "successes" and "failures" under the variable.  The normal probability plot has equal tail lengths, but is slightly concave down, representing the slight left skew of the distribution.  However, compared to the distribution of p_high with sample size 10, the distribution with sample size 200 is basically normal because of the Central Limit Theory that as sample size increases, the distributions begin to normalize.
+
+#Part 2
+
+##Load Dataset
+```{r}
+gss <- read.csv("https://stat.duke.edu/~mc301/data/gss2010.csv", stringsAsFactors = FALSE)
+```
+
+##1. Working Extra
+Do these data provide convincing evidece that Americans work extra hours beyond their usual schedule more than 5 days per month on average?
+
+###Hypotheses
+$H_O: \mu = 5$ 
+Americans spend 5 days per month working extra hours
+
+$H_A: \mu > 5$
+Americans spend more than 5 days per month working extra hours
+
+```{r}
+gss %>% 
+  filter(!is.na(moredays)) %>%
+  summarise(mean(moredays), median(moredays), sd(moredays), length(moredays)) #Gives summary statistics of the variable moredays
+```
+
+###Plot Distribution
+```{r}
+ggplot(data = gss, aes(x = moredays)) + 
+  geom_histogram(binwidth = 1) #creation of distribution of moredays variable
+```
+The distribution of the variable moredays is extrelemly right skewed, partially due to the natural minimum of the variable.  However, the sample size is large enough for the sampling distribution to be nearly normal according to the Central Limit Theory.  
+
+###Calculate P-Value
+```{r p_value_moredays}
+moredays_summ <- gss %>% 
+  filter(!is.na(moredays)) %>%
+  summarise(xbar = mean(moredays), s = sd(moredays), n = length(moredays))
+standard_error <- moredays_summ$s / sqrt(moredays_summ$n)
+t <- (moredays_summ$xbar - 5) / standard_error
+df <- moredays_summ$n - 1
+moredays_summ
+
+pt(t, df, lower.tail = FALSE) #p-value
+```
+Since the p-value is very small (less than \alpha = 0.05), it is possible to reject the null hypothesis, that Americans spend 5 days per month working extra hours, in favor of the alternative hypothesis, that Americans spend more than 5 days per month working extra hours. The data provides convincing evidence that Americans, on average, spend more than 5 days per month working extra hours.
+
+###Finding Confidence Interval
+```{r confidence_interval_calculation}
+t_star <- qt(0.975, df) #calculates 95% confidence interval
+pt_est <- moredays_summ$xbar
+pt_est + c(-1,1) * t_star * standard_error
+```
+Since we rejected the null hypothesis, the null hypothesis of Americans working 5 days extra per month, should not fall within the confidence interval.  The confidence interval of 5.2733-6.1477 supports this claim since 5 does not fall within that range. As a result, we are 95% confident that the true mean number of extra work day for the population will fall within the confidence interval.
+
+###R Function
+```{r R_Functions}
+# Hypothesis Test
+t.test(gss$moredays, mu = 5, alternative = "greater", conf.level = 0.95)
+```
+Based on the Central Limit Theory, we can calculate the test statistic, number of standard errors away from the null value the observed sample statistic using
+T and the appropriate degrees of freedom.  We can then use T and the degrees of freedom to calculate our p-value as seen above.
+
+##2. Working Extra and Education
+Do the average number of days Americans work extra hours beyond their usual schedule vary between those with and without a college degree? 
+
+###Hypotheses
+$H_O: \mu_{c} = \mu_{nc}$ 
+The average number of days Americans work extra hours does not vary between those with and without college.
+
+$H_A: \mu_{c} \neq \mu_{nc}$
+The average number of days Americans work extra hours does vary between those with and without college.
+
+###Mutate Variable
+```{r}
+gss <- gss %>% #mutate degree variable into binary variable
+  filter(!is.na(degree)) %>%
+  mutate(degree_recode = ifelse(degree %in% c("GRADUATE", "BACHELOR", "JUNIOR COLLEGE"), "COLLEGE",
+                             ifelse(degree %in% c("HIGH SCHOOL", "LT HIGH SCHOOL"), "NO COLLEGE", degree)))
+```
+It is necessary to mutate the variable degree in order to create a binary variable, degree_recode.  Degree_recode has two outcomes: college and no college, which are both combinations of the possible outcomes in degree.
+
+###Plot Distribution
+```{r}
+ggplot(data = gss, aes(x = moredays)) +
+  geom_histogram() +
+  facet_wrap(~degree_recode) #faceted distribution of variable moredays and degree_recode
+```
+The distribution of the variable moredays for samples of people who have and have not gone to college are extremely right skewed.  The number of people in the sample who have no college is larger than the number of people who have gone to college.  However, the total sample size is large enough for the sampling distribution of proportions to be nearly normal according to the Central Limit Theory.
+
+```{r}
+moredays_degree_recode_summ <- gss %>% 
+  filter(!is.na(moredays)) %>%
+  group_by(degree_recode) %>%
+  summarise(xbar = mean(moredays), s = sd(moredays), n = length(moredays))
+moredays_degree_recode_summ
+```
+People who have gone to college appear to work more extra days per month than people who did not attend college as seen by the means in the above data frame.
+
+###Calculate P-Value
+```{r}
+se <- sqrt((moredays_degree_recode_summ$s[1]^2 / moredays_degree_recode_summ$n[1]) 
+           + (moredays_degree_recode_summ$s[2]^2 / moredays_degree_recode_summ$n[2]))
+t <- ((moredays_degree_recode_summ$xbar[1] - moredays_degree_recode_summ$xbar[2]) - 0) / se
+df <- min(moredays_degree_recode_summ$n[1], moredays_degree_recode_summ$n[2]) - 1
+
+p_value <- ((1-pt(t, df)) * 2)
+```
+Since the p-value is very small (less than 0.05), we can reject the null hypothesis in favor of the alternativ ehypothesis that the average number of days Americans work extra hours does vary between those with and without college. The data provides convincing evidence that the number of extra work days  does vary between people with and without college.
+
+###Calculate Confidence Interval
+```{r}
+t_star <- qt(0.975, df)
+pt_est <- moredays_degree_recode_summ$xbar[1] - moredays_degree_recode_summ$xbar[2]
+round(pt_est + c(-1,1) * t_star * se)
+```
+Since we rejected the null hypothesis, I would not expect the difference in average number of extra days worked per month between  poeple with and without college to be included within the confidence interval. The confidence interval of 1.15-2.93 supports this claim since the difference of means, $difference = 6.872470-4.831547$, 2.0409 does not fall within that range. As a result, we are 95% confident that the true difference of means between people with and without college will fall within the confidence interval.
+
+###R Function
+```{r R_Functions_2}
+# Hypothesis Test
+t.test(gss$moredays ~ gss$degree_recode, mu = 0, alternative = "two.sided", conf.level = 0.95)
+```
+Based on the Central Limit Theory, we can calculate the test statistic, number of standard errors away from the null value the observed sample statistic using T and the appropriate degrees of freedom. We can then use T and the degrees of freedom to calculate our p-value as seen above.
+
+##3. Life After Death 
+```{r}
+postlife_summ <- gss %>%
+  filter(!is.na(postlife)) %>%
+  summarise(x = sum(postlife == "YES"), n = length(postlife), p_hat = x / n)
+postlife_summ
+```
+$p_hat = .81087$ is the number of "yes" divided by all of the observations in the variable postlife.
+
+###Calculate Confidence Interval
+```{r}
+se <- sqrt((postlife_summ$p_hat*(1-postlife_summ$p_hat)) / postlife_summ$n)
+
+z_star <- qnorm(0.95)
+pt_est <- postlife_summ$p_hat
+pt_est + c(-1,1) * z_star * se
+```
+
+###R Function
+```{r R_Functions_3}
+# Confidence Interval
+prop.test(postlife_summ$x, postlife_summ$n, correct = FALSE, )$conf.int
+```
+
+###Bootstrapping
+```{r}
+gss <- gss%>%
+  filter(!is.na(postlife))
+props <- data.frame(values = rep(NA, 15000))
+for (i in 1:15000){
+  s <- sample(gss$postlife, length(gss$postlife), replace = TRUE)
+  prop <- sum(s == "YES") / length(gss$postlife)
+  props$values[i] <- prop
+}
+```
+
+###Calculate Confidence Interval
+```{r}
+se <- sd(props$values)
+z_star <- qnorm(0.95)
+pt_est <- postlife_summ$p_hat
+pt_est + c(-1,1) * z_star * se
+```
+
+###R Function
+```{r R_Functions_4}
+# Confidence Interval
+prop.test(postlife_summ$x, postlife_summ$n, correct = FALSE, )$conf.int
+```
+The Central Limit Theory approach and the bootstrap approach to finding the confidence interval provides two slightly different confidence intervals, although similar. The calculations of the confidence interval in both approaches is the same, meaning that the way the data was sampled accounts for the differences in the confidence intervals.  The calculation os the standard error in each approach is different.  In the Central Limit theorem approach, p_hat is used to calculate se while in the bootstrap approach, the data frame of 15000 samples is used to calculate the confidence interval.
+
+##4. Make Your Own
+Explanatory Variable:
+Marital Status(marital)
+
+Response Variable:
+Most men are better suited emotionally for politics than are most women(fepol) 
+
+Is there a difference between the proportions of people who think men are better suited emotionally for politics than women  based on whether they are married or not?
+
+##Hypotheses
+$H_O: p_{married} = p_{not married}$
+There is no difference between the proportions of people who think men are better suited emotionally for politics than women based on whether they are married or not
+
+$H_A: p_{married} \neq p_{not married}$
+There is a difference between the proportions of people who think men are better suited emotionally for politics than women based on whether they are married or not
+
+p represents people who believe that men are better suited for politics than women.  
+
+###Mutate Variables
+```{r}
+gss <- gss %>%
+  filter(!is.na(fepol)) %>%
+  mutate(fepol_recode = ifelse(fepol %in% c("AGREE"), "AGREE",
+                             ifelse(fepol %in% c("DISAGREE"), "DISAGREE", 
+                                    ifelse(fepol %in% c("NOT SURE", "NO ANSWER", "NOT APPLICABLE"), NA, fepol))))
+```
+
+```{r}
+gss <- gss %>%
+  filter(!is.na(marital)) %>%
+  mutate(marital_recode = ifelse(marital %in% c("MARRIED"), "MARRIED",
+                             ifelse(marital %in% c("WIDOWED", "SEPARATED", "DIVORCED", "NEVER MARRIED"), "NOT MARRIED",
+                                    ifelse(marital %in% c("NO ANSWER"), NA, marital))))
+```
+It was necessary to mutate both variables in order to make each one binary, so that it is easier to make inferences for the difference of two proportions.  
+
+###Plot Distribution
+```{r}
+ggplot(data = gss, aes(x = marital_recode, fill = fepol_recode)) +
+  geom_histogram(binwidth = 0.2, position = "fill")
+```
+Based on the histogram, it seems to be that people who are not married tend to agree with the statement that men are more emotionally suited to be in politics than women, more often than people who are married.
+
+```{r}
+gss_marital_fepol <- gss %>% 
+  group_by(marital_recode) %>%
+  summarise(x = sum(fepol_recode == "AGREE"), n = length(fepol_recode), p_hat = x / n)
+gss_marital_fepol
+```
+The difference in p_hat for married and not married people, $difference = 0.20200 - 0.23219$, is -0.03019. 
+
+###Create Pooled Proportion
+```{r}
+#pooled proportion
+total_suc <- sum(gss_marital_fepol$x)
+total_n <- sum(gss_marital_fepol$n)
+(p_pool <- total_suc / total_n)
+```
+Since the p_hats for married and not married people differ, there needs to be a reasonable value for p1 and p2 that are equal to each other, and that make sense in the context of these data, so that we can test the null hypothesis.  In order to do that, a pooled proportion was calculated, .2196339, above and used to calculate an appropriate p-value below.
+
+###Calculate P-Value
+```{r}
+se <- sqrt((p_pool*(1 - p_pool) / gss_marital_fepol$n[1]) 
+           + (p_pool*(1-p_pool) / gss_marital_fepol$n[2]))
+z <- ((gss_marital_fepol$p_hat[1] - gss_marital_fepol$p_hat[2]) - 0) / se
+
+pnorm(1-z, lower.tail= FALSE) * 2
+```
+Since the p-value is  small (less than 0.05), we can reject the null hypothesis in favor of the alternativ hypothesis that there is a difference between the proportions of people who think men are better suited emotionally for politics than women based on whether they are married or not. The data provides convincing evidence that people think men are better suited for politics based on whether or not they are married.
+
+###Calculate Confidence Interval
+```{r}
+se2 <- se <- sqrt(((gss_marital_fepol$p_hat[1] * (1 - gss_marital_fepol$p_hat[1])) / gss_marital_fepol$n[1]) 
+           + ((gss_marital_fepol$p_hat[2] * (1- gss_marital_fepol$p_hat[1])) / gss_marital_fepol$n[2]))
+z_star <- qt(0.95, df)
+pt_est <- gss_marital_fepol$p_hat[1] - gss_marital_fepol$p_hat[2]
+pt_est + c(-1,1) * t_star * se2
+```
+Since we rejected the null hypothesis, I would not expect the difference in p_hats, -0.03019 between people who are married and not married to be included in the confidence interval. The confidence interval of -0.777-0.017 supports this claim since the difference of proportions does not fall within that range. As a result, we are 95% confident that the true difference of proportions between people who are married and not married will fall within the confidence interval.
+
+###R Function
+```{r}
+prop.test(x = c(gss_marital_fepol$x[1], gss_marital_fepol$x[2]),
+          n = c(gss_marital_fepol$n[1], gss_marital_fepol$n[2]), correct = FALSE)
+```
+
+#Part 3: Extra Credit
+```{r}
+zinc <- read.csv("https://stat.duke.edu/~mc301/data/zinc.csv", stringsAsFactors = FALSE) #load dataset
+```
+
+##Hypotheses
+$H_O:\mu = 0$
+The true average concentration in the bottom water is that of surface water
+
+$H_A: \mu > 0$
+The true average concentration in the bottom water is greater than that of surface water
+
+###Calculate P-Value
+```{r}
+zincdifference <- zinc %>% #mutate degree variable into binary variable
+  mutate(diff = bottom - surface) %>%
+  summarise(xbar = mean(diff), s = sd(diff), n = length(diff))
+se <- zincdifference$s / sqrt(zincdifference$n)
+t <- (zincdifference$xbar - 0) / se
+df <- zincdifference$n - 1
+
+pt(t, df, lower.tail = FALSE) #p-value
+```
+Since the p-value is small (less than 0.05), we can reject the null hypothesis in favor of the alternative hypothesis that the true average concentration in the bottom water is greater than that of surface water. The data provides convincing evidence that the concentration of the bottom water is higher than the concentration of the surface water.
+
+###Calculate Confidence Interval
+```{r}
+t_star <- qt(0.975, df) #calculates 95% confidence interval
+pt_est <- zincdifference$xbar
+pt_est + c(-1,1) * t_star * se
+```
+Since we rejected the null hypothesis, I would not expect 0, the mean for the null hypothesis to be included in the confidence interval. The confidence interval of 0.043006-0.117794 supports this claim since 0 within that range. As a result, we are 95% confident that the true mean of the overall difference between the bottom and surface water zinc concentration will fall within the confidence interval.
+
+
+
+
